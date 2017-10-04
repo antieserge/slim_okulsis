@@ -29,7 +29,11 @@ class PostgreSQLConnectLogPDO implements \Zend\ServiceManager\FactoryInterface {
                             PostgreSQLConnectPDOConfig::getConfig());
             * 
             */
-            $pdo = new \PDO("sqlsrv:Server=.;Database=BILSANET", "sa", "12345678oki");
+             $pdo = new \PDO("sqlsrv:Server=ZZX;Database=BILSANET", 
+                            "sa", 
+                            "12345678oki"
+                            );
+     
             return $pdo;
         } catch (PDOException $e) {
             return false;

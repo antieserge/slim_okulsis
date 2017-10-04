@@ -97,7 +97,7 @@ class BLLManagerConfig{
                 'actUsersActionStatisticsBLL' => 'BLL\BLL\ActUsersActionStatistics',
                 'sysNotificationRestservicesBLL' => 'BLL\BLL\SysNotificationRestservices',
                 'sysSectorsBLL' => 'BLL\BLL\SysSectors',
-                 
+                  'mblLoginBLL' => 'BLL\BLL\mblLogin',
                  
                  
              ),
