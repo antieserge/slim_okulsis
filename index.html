@@ -358,7 +358,7 @@ and open the template in the editor. Ğİ
                     url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
                     data: {
                      
-                        kisiId: '5AD211E9-B275-418C-8496-21C1B4790CD6',
+                        kisiId: 'AF7560B2-29FD-47DC-A0BE-B295B3841871',
                         url: 'mobilfirstdata_mbllogin',
                        
                     },
@@ -380,7 +380,7 @@ and open the template in the editor. Ğİ
                     url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
                     data: { 
                         url: 'mobilMenu_mbllogin',
-                        RolID: 77,
+                        RolID: 9999,
                         ParentID: 0, 
                        
                     },
@@ -500,23 +500,145 @@ and open the template in the editor. Ğİ
                         console.warn('error text status-->' + textStatus);
                     }
                 });   
+         
+        
+          $.ajax({
+                    //  url : '../Slim_Proxy_sorubankasi/SlimProxyBoot.php',   
+                    url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
+                    data: { 
+                        url: 'InsertDevamsizlik_mbllogin',
+                       
+                        SinifID:'F4201B97-B073-4DD7-8891-8091C3DC82CF', 
+                        SinifDersID:'F664DD5B-13A9-4936-A5AE-141A83FCB426',
+                        DersSirasi:1,
+                        DonemID:1,
+                        DersYiliID:'fc4675fc-dafb-4af6-a3c2-7acd22622039',
+                        kisiId: '1250E188-B635-4418-ABB4-98E8886C707D',
+                        DersID: '5BE98796-8A96-4871-80AA-CBF5AFCA9E7B',
+                        OkulOgretmenID:'5BE98796-8A96-4871-80AA-CBF5AFCA9E7B',
+                        Tarih:'2017-01-02',
+                        XmlData:'<Table><Ogrenci><OgrenciID>c6bc540a-1c6e-4ee9-a7f6-3d76eb9027eb</OgrenciID><DevamsizlikKodID>0</DevamsizlikKodID><Aciklama/></Ogrenci><Ogrenci><OgrenciID>4d6ea4f9-8ad9-410e-97f9-930b6b8fe41a</OgrenciID><DevamsizlikKodID>0</DevamsizlikKodID><Aciklama/></Ogrenci><Ogrenci><OgrenciID>c82cc86a-6dde-4213-82a2-812344275720</OgrenciID><DevamsizlikKodID>0</DevamsizlikKodID><Aciklama/></Ogrenci><Ogrenci><OgrenciID>8eae147f-0798-4a77-af17-16972fc10382</OgrenciID><DevamsizlikKodID>0</DevamsizlikKodID><Aciklama/></Ogrenci><Ogrenci><OgrenciID>cf7223bc-4b0c-49c5-bf49-922a4d7f252d</OgrenciID><DevamsizlikKodID>0</DevamsizlikKodID><Aciklama/></Ogrenci></Table>',
+                        /* 
+                        @SinifID='F4201B97-B073-4DD7-8891-8091C3DC82CF', 
+                        @DersSirasi=1,
+                        @DersYiliID='fc4675fc-dafb-4af6-a3c2-7acd22622039',
+                        ---------------------
+                        @OgretmenID='1250E188-B635-4418-ABB4-98E8886C707D' 
+                        @Tarih='2017-01-02 00:00:00', 
+                        @XmlData=@p4,
+                        @SinifDersID='F664DD5B-13A9-4936-A5AE-141A83FCB426' 
+                        @DonemID=1
+                        @OkulOgretmenID='E00C3707-A59C-475C-BA30-7537FF017B2A', 
+                        @YoklamaTarihi='2017-01-02 14:54:42.273',
+                        @KayitTarihi='2017-01-02 14:54:42.273'
+
+                         */
+                        
+                    },
+                    method: 'GET',
+                    success: function (data, textStatus, jqXHR) {
+  
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.warn('error text status-->' + textStatus);
+                    }
+                });   
         
         
         
+          $.ajax({
+                    //  url : '../Slim_Proxy_sorubankasi/SlimProxyBoot.php',   
+                    url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
+                    data: { 
+                        url: 'VeliOgrencileri_mbllogin', 
+                        dersYiliID:'0F17DCF7-EFCF-41D8-82A0-D4CCFF77E487',   
+                        kisiId: '5B153648-7B6B-4160-9274-B2EA69A1D717', 
+                    },
+                    method: 'GET',
+                    success: function (data, textStatus, jqXHR) {
+  
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.warn('error text status-->' + textStatus);
+                    }
+                }); 
         
         
         
+               $.ajax({
+                    //  url : '../Slim_Proxy_sorubankasi/SlimProxyBoot.php',   
+                    url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
+                    data: { 
+                        url: 'OgrenciDevamsizlikListesi_mbllogin', 
+                        dersYiliID:'0F17DCF7-EFCF-41D8-82A0-D4CCFF77E487',   
+                        kisiId: '5E2D953C-0A7D-4A63-9368-01690DC7FE51', 
+                    },
+                    method: 'GET',
+                    success: function (data, textStatus, jqXHR) {
+  
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.warn('error text status-->' + textStatus);
+                    }
+                }); 
         
         
+               $.ajax({
+                    //  url : '../Slim_Proxy_sorubankasi/SlimProxyBoot.php',   
+                    url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
+                    data: { 
+                        url: 'Kurumyoneticisisubelistesi_mbllogin', 
+                        dersYiliID:'0F17DCF7-EFCF-41D8-82A0-D4CCFF77E487',   
+                      
+                    },
+                    method: 'GET',
+                    success: function (data, textStatus, jqXHR) {
+  
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.warn('error text status-->' + textStatus);
+                    }
+                }); 
         
         
-        
-        
-        
-        
-        
-        
-        
+           $.ajax({
+                    //  url : '../Slim_Proxy_sorubankasi/SlimProxyBoot.php',   
+                    url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
+                    data: { 
+                        url: 'Kysubeogrencilistesi_mbllogin', 
+                        sinifID:'F4201B97-B073-4DD7-8891-8091C3DC82CF', 
+                      
+                    },
+                    method: 'GET',
+                    success: function (data, textStatus, jqXHR) {
+  
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.warn('error text status-->' + textStatus);
+                    }
+                }); 
+                
+                
+                   $.ajax({
+                    //  url : '../Slim_Proxy_sorubankasi/SlimProxyBoot.php',   
+                    url: '../Slim_Proxy_okulsis/SlimProxyBoot.php',
+                    data: { 
+                        url: 'KySubeOgrenciDersListesi_mbllogin', 
+                        ogrenciSeviyeID:'F9871608-EAF7-45B2-AE89-5B5EE1975D28', 
+                      
+                    },
+                    method: 'GET',
+                    success: function (data, textStatus, jqXHR) {
+  
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.warn('error text status-->' + textStatus);
+                    }
+                }); 
+                
+                
+                
+                
                 
                 
                 ////////////////////////

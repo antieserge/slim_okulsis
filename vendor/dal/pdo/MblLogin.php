@@ -245,6 +245,12 @@ class MblLogin extends \DAL\DalSlim {
                 EXEC @return_value = [dbo].[PRC_GNL_Kisi_TumRoller_FindByID]
                     @KisiID =  '".$params['kisiId']."' ;
 
+                SELECT  
+                    null as KisiID , 
+                    'LUTFEN SEÇİNİZ...' as adsoyad,
+                    '' as [TCKimlikNo]  
+
+                union 
                 SELECT 'Return Value' = @return_value;
  
                  "; 
@@ -287,7 +293,23 @@ class MblLogin extends \DAL\DalSlim {
                                     ) ;
                    
                     INSERT #okimobilfirstdata  EXEC  [dbo].[PRC_GNL_Kisi_TumRoller_FindByID]  @KisiID= '".$params['kisiId']."' ;
-                      SELECT  
+                      
+                        SELECT  
+                            null AS OkulKullaniciID ,
+                            null AS OkulID,
+                            null AS KisiID,
+                            -1 AS RolID, 
+                            'LÜTFEN SEÇİNİZ...' AS OkulAdi,
+                            '' AS MEBKodu,
+                            '' AS ePosta,
+                             null AS DersYiliID,
+                            '' AS EgitimYilID, 
+                            '' AS EgitimYili,
+                            0 AS DonemID 
+
+                        UNION  	 
+
+                        SELECT  
                             sss.[OkulKullaniciID] ,
                             sss.[OkulID],
                             sss.[KisiID],
@@ -300,10 +322,10 @@ class MblLogin extends \DAL\DalSlim {
                             EY.EgitimYili,
                             DY.DonemID 
                     FROM #okimobilfirstdata sss
-                    inner join [dbo].[GNL_Okullar]  oo on oo.[OkulID] = sss.[OkulID] 
-                    inner join GNL_DersYillari DY on DY.OkulID = sss.OkulID and DY.AktifMi =1 
+                    inner join [dbo].[GNL_Okullar] oo ON oo.[OkulID] = sss.[OkulID] 
+                    inner join GNL_DersYillari DY ON DY.OkulID = sss.OkulID and DY.AktifMi =1 
                     inner join GNL_EgitimYillari EY ON EY.EgitimYilID = DY.EgitimYilID AND DY.AktifMi = 1
-                    inner join [GNL_Roller] rr on rr.[RolID] =  sss.[RolID];
+                    inner join [GNL_Roller] rr ON rr.[RolID] =  sss.[RolID];
 		    SET NOCOUNT OFF;
 
                  "; 
@@ -352,6 +374,7 @@ class MblLogin extends \DAL\DalSlim {
                     where active = 0 AND deleted = 0 AND 
                         [RolID] = ".intval($params['RolID'])."  AND 
                         [ParentID] = ".intval($parent)."
+                    order by MenuID
                  "; 
             $statement = $pdo->prepare($sql);            
      //   echo debugPDO($sql, $params);
@@ -446,7 +469,30 @@ class MblLogin extends \DAL\DalSlim {
             INSERT  INTO #tmp
             EXEC dbo.[PRC_GNL_DersYili_Find] @OkulID = '".$params['OkulID']."'  
  
-            SELECT 
+            SELECT  
+                -1 AS HaftaGunu,
+                -1 AS DersSirasi, 
+                null AS SinifDersID ,
+                null  AS DersAdi,
+                null  AS DersKodu,
+                null  AS SinifKodu,
+                null  AS SubeGrupID,
+                null  AS BaslangicSaati,
+                null  AS BitisSaati,
+                null  AS DersBaslangicBitisSaati,
+                null  AS SinifOgretmenID,
+                null  AS DersHavuzuID,
+                null  AS SinifID,
+                null  AS DersID, 
+                null  AS Aciklama1,
+                'LÜTFEN SEÇİNİZ...' AS Aciklama,
+                null  AS DersYiliID,
+                null  AS DonemID, 
+                null  AS EgitimYilID  
+
+            union  
+
+            (SELECT 
                 DP.HaftaGunu,
 		DP.DersSirasi,
 		DP.SinifDersID,
@@ -481,7 +527,7 @@ class MblLogin extends \DAL\DalSlim {
 		INNER JOIN GNL_Dersler DRS ON DH.DersID = DRS.DersID
 		LEFT JOIN  GNL_DersSaatleri DS ON DS.DersYiliID = SNF.DersYiliID AND DS.SubeGrupID = SNF.SubeGrupID AND DS.DersSirasi = DP.DersSirasi
 		inner join #tmp on #tmp.DersYiliID = SNF.DersYiliID and DP.DonemID = #tmp.DonemID 
-            ORDER BY HaftaGunu,DS.BaslangicSaati,DersSirasi,DRS.DersAdi ;  
+            ) ORDER BY HaftaGunu, BaslangicSaati,DersSirasi, DersAdi ;  
 
             SET NOCOUNT OFF;
 
@@ -513,11 +559,48 @@ class MblLogin extends \DAL\DalSlim {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
             $sql = "  
             SET NOCOUNT ON;   
-                exec dbo.PRC_GNL_DersProgrami_Find_forOgretmenDersSaatleri 
+            IF OBJECT_ID('tempdb..#ogretmenDersSaatleri') IS NOT NULL DROP TABLE #ogretmenDersSaatleri; 
+    
+            CREATE TABLE #ogretmenDersSaatleri (
+                    BaslangicSaati datetime, 
+                    BitisSaati datetime,
+                    DersSirasi integer, 
+                    DersAdi varchar(100), 
+                    DersKodu varchar(100),
+                    Aciklama varchar(100),
+                    DersID [uniqueidentifier] ,
+                    HaftaGunu integer 
+                            ) ; 
+							 
+            INSERT #ogretmenDersSaatleri      exec dbo.PRC_GNL_DersProgrami_Find_forOgretmenDersSaatleri 
                     @OgretmenID='".$params['kisiId']."',
                     @SinifID='".$params['sinifID']."',
                     @Tarih='".$params['tarih']."' ;  
-            SET NOCOUNT OFF; 
+                        
+            SELECT     
+                null as BaslangicSaati , 
+                null as BitisSaati ,
+                null as DersSirasi , 
+                null as DersAdi , 
+                null as DersKodu ,
+                'LÜTFEN SEÇİNİZ...' as Aciklama,
+                null as DersID ,
+                -1 as HaftaGunu 
+
+            UNION 
+ 
+            SELECT  
+                sss.BaslangicSaati , 
+                sss.BitisSaati ,
+                sss.DersSirasi , 
+                sss.DersAdi , 
+                sss.DersKodu ,
+                sss.Aciklama,
+                sss.DersID ,
+                sss.HaftaGunu 
+            FROM #ogretmenDersSaatleri sss;
+ 
+            SET NOCOUNT OFF;  
                  "; 
             $statement = $pdo->prepare($sql);   
             // echo debugPDO($sql, $params);
@@ -557,12 +640,44 @@ class MblLogin extends \DAL\DalSlim {
             
             $sql = "  
             SET NOCOUNT ON;   
+            IF OBJECT_ID('tempdb..#tmpe') IS NOT NULL DROP TABLE #tmpe; 
+            CREATE TABLE #tmpe ( 
+				OgrenciID [uniqueidentifier] ,
+				Tarih [datetime]  ,
+				DersSirasi  [int] ,
+				DersYiliID [uniqueidentifier],
+				Numarasi  [int]  , 
+				Adi [varchar](50),
+				Soyadi [varchar](50),  
+				TCKimlikNo  [varchar](50) , 
+				CinsiyetID  [int]  ,
+				DevamsizlikKodID [int] , 
+				Aciklama [varchar](200)  
+		    );  
+		 
+                INSERT  INTO #tmpe 
                 exec dbo.PRC_GNL_OgrenciDevamsizlikSaatleri_Find_SinifDersSaati 
                     @SinifID='".$params['sinifID']."',
                     @Tarih='".$params['tarih']."' ,
                     @DersSirasi='".$params['dersSirasi']."',
                     @DersYiliID='".$params['dersYiliID']."', 
                     @OgretmenID='".$params['kisiId']."'  ;  
+                        
+
+                SELECT 
+                    tt.OgrenciID,
+                    tt.Tarih,
+                    tt.Numarasi  ,   
+                    UPPER(concat(tt.Adi , ' ', tt.Soyadi)) AS adsoyad ,
+                    tt.CinsiyetID ,
+                    tt.DevamsizlikKodID,
+                    tt.Aciklama,
+                    tt.DersSirasi,
+                    tt.DersYiliID,
+                    ff.Fotograf
+                FROM #tmpe  tt
+                LEFT JOIN GNL_Fotograflar ff on ff.KisiID =tt.OgrenciID ; 
+
             SET NOCOUNT OFF; 
                  "; 
             $statement = $pdo->prepare($sql);   
@@ -615,14 +730,111 @@ class MblLogin extends \DAL\DalSlim {
         }
     }
    
+  
+      /**   
+     * @author Okan CIRAN
+     * @ devamsızlık  kayıt  !!
+     * @version v 1.0  05.10.2017
+     * @param type $params
+     * @return array
+     * @throws \PDOException
+     */
+    public function insertDevamsizlik($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
+            $pdo->beginTransaction();
+
+            $OgretmenID = '-1';
+            if ((isset($params['OgretmenID']) && $params['OgretmenID'] != "")) {
+                $OgretmenID = $params['OgretmenID'];
+            }
+            $DersYiliID = '-2';
+            if ((isset($params['DersYiliID']) && $params['DersYiliID'] != "")) {
+                $DersYiliID = $params['DersYiliID'];
+            }
+            $SinifID = NULL;
+            if ((isset($params['SinifID']) && $params['SinifID'] != "")) {
+                $SinifID = $params['SinifID'];
+            }
+            $DersID = NULL;
+            if ((isset($params['DersID']) && $params['DersID'] != "")) {
+                $DersID = $params['DersID'];
+            }
+            $SinifDersID = NULL;
+            if ((isset($params['SinifDersID']) && $params['SinifDersID'] != "")) {
+                $SinifDersID = $params['SinifDersID'];
+            }
+            $DersSirasi = NULL;
+            if ((isset($params['DersSirasi']) && $params['DersSirasi'] != "")) {
+                $DersSirasi = $params['DersSirasi'];
+            } 
+            $DonemID = NULL;
+            if ((isset($params['DonemID']) && $params['DonemID'] != "")) {
+                $DonemID = $params['DonemID'];
+            } 
+            $OkulOgretmenID = NULL;
+            if ((isset($params['OkulOgretmenID']) && $params['OkulOgretmenID'] != "")) {
+                $OkulOgretmenID = $params['OkulOgretmenID'];
+            } 
+            $Tarih = NULL;
+            if ((isset($params['Tarih']) && $params['Tarih'] != "")) {
+                $Tarih = $params['Tarih'];
+            } 
+            $XmlData = NULL;
+            if ((isset($params['XmlData']) && $params['XmlData'] != "")) {
+                $XmlData = $params['XmlData'];
+            } 
+          
+             
+            $sql = " 
+                 
+
+                exec dbo.PRC_GNL_OgrenciDevamsizlikSaatleri_SaveXML 
+                    @DersYiliID='" . $OgretmenID . "',
+                    @Tarih='" . $Tarih . "', 
+                    @DersSirasi=" . intval($DersSirasi) . " ,
+                    @XmlData= '" . $XmlData . "',
+                    @SinifDersID='" . $SinifDersID . "' ; 
+
     
-    
-    
-    
-    
-    
-    
-    
+                exec PRC_GNL_SaveOgretmenDevamsizlikGirisiLog 
+                    @OgretmenID= '" . $OgretmenID . "',
+                    @DersYiliID= '" . $DersYiliID . "',
+                    @SinifID='" . $SinifID . "',
+                    @DersID= '" . $DersID . "',
+                    @DersSirasi=" . intval($DersSirasi) . " ; 
+                 
+ 
+                exec PRC_GNL_OgretmenDevamKontrol_Save 
+                    @OgretmenID='" . $OgretmenID . "', 
+                    @Tarih='" . $Tarih . "',
+                    @DersSirasi=" . intval($DersSirasi) . ",
+                    @SinifDersID='" . $SinifDersID . "',
+                    @DonemID=" . intval($DersSirasi) . " ; 
+
+                exec PRC_GNL_SinifDevamsizlikKayitlari_Save 
+                    @OkulOgretmenID='" . $OkulOgretmenID . "',
+                    @SinifID='" . $SinifID . "',
+                    @YoklamaTarihi='" . date("Y-m-d H:i:s") . "',
+                    @KayitTarihi='" . date("Y-m-d H:i:s") . "';
+ 
+                    ";
+            $statement = $pdo->prepare($sql);
+            // echo debugPDO($sql, $params);
+            $result = $statement->execute();
+            $insertID =1;
+            $errorInfo = $statement->errorInfo(); 
+          
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            $pdo->commit();
+            return array("found" => true, "errorInfo" => $errorInfo, "lastInsertId" => $insertID);
+        } catch (\PDOException $e /* Exception $e */) {
+            $pdo->rollback();
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+
     /**
      * 
      * @author Okan CIRAN
@@ -678,6 +890,554 @@ class MblLogin extends \DAL\DalSlim {
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
+    
+    
+    
+       /** 
+     * @author Okan CIRAN
+     * @ login olan veli / yakın ın ögrenci listesi   !!
+     * @version v 1.0  09.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function veliOgrencileri($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+             
+            $sql = "  
+            SET NOCOUNT ON;  
+            IF OBJECT_ID('tempdb..#ogrenciIdBul') IS NOT NULL DROP TABLE #ogrenciIdBul; 
+    
+            CREATE TABLE #ogrenciIdBul
+                (
+                        OgrenciID  [uniqueidentifier]  
+                ) ;
 
+            INSERT #ogrenciIdBul exec PRC_GNL_OgrenciYakinToOgrenciID_Find @YakinID='".$params['kisiId']."' ; 
+            
+            SELECT * FROM ( 
+                SELECT 
+                    NULL AS OgrenciID,
+                    NULL AS SinifID,
+                    NULL AS DersYiliID,
+                    NULL AS SinifKodu,
+                    NULL AS SinifAdi, 
+                    NULL AS Numarasi, 
+                    NULL AS OgrenciOkulBilgiID,
+                    NULL AS KisiID,
+                    NULL AS CinsiyetID,
+                    NULL AS Adi,
+                    NULL AS Soyadi,
+                    'LÜTFEN SEÇİNİZ...' AS Adi_Soyadi,
+                    NULL AS TCKimlikNo,
+                    NULL AS ePosta, 
+                    NULL AS OkulID,
+                    NULL AS OgrenciSeviyeID,
+                    NULL AS Fotograf
+                UNION
+                SELECT 
+                    GOS.[OgrenciID],
+                    SINIF.SinifID,
+                    SINIF.DersYiliID,
+                    SINIF.SinifKodu,
+                    SINIF.SinifAdi, 
+                    OOB.[Numarasi], 
+                    OOB.OgrenciOkulBilgiID,
+                    KISI.[KisiID],
+                    KISI.[CinsiyetID],
+                    KISI.[Adi],
+                    KISI.[Soyadi],
+                    KISI.[Adi] + ' ' + KISI.[Soyadi] AS Adi_Soyadi,
+                    KISI.[TCKimlikNo],
+                    KISI.[ePosta], 
+                    DY.OkulID,
+                    GOS.[OgrenciSeviyeID],
+                    fo.[Fotograf]		
+                FROM 
+                        GNL_OgrenciSeviyeleri GOS
+                INNER JOIN 
+                        GNL_Ogrenciler OGR ON (OGR.OgrenciID = GOS.OgrenciID)
+                INNER JOIN 
+                        GNL_Kisiler KISI ON (KISI.KisiID = GOS.OgrenciID)
+                INNER JOIN 
+                        GNL_Siniflar SINIF ON (SINIF.SinifID = GOS.SinifID)
+                INNER JOIN 
+                        GNL_DersYillari DY ON DY.DersYiliID = SINIF.DersYiliID
+                INNER JOIN 
+                        GNL_OgrenciOkulBilgileri OOB ON OOB.OgrenciID = OGR.OgrenciID AND OOB.OkulID= DY.OkulID 
+                LEFT JOIN GNL_Fotograflar fo on fo.KisiID = GOS.OgrenciID
+                WHERE 
+                        GOS.OgrenciID in (SELECT distinct OgrenciID FROM #ogrenciIdBul) 
+                AND 
+                        SINIF.DersYiliID ='".$params['dersYiliID']."'
+            ) as assss 
+            ORDER BY Numarasi; 
+
+            SET NOCOUNT OFF; 
+                 "; 
+            $statement = $pdo->prepare($sql);   
+            // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+  
+       
+    /** 
+     * @author Okan CIRAN
+     * @ login olan veli / yakın ın ögrenci listesi   !!
+     * @version v 1.0  09.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function ogrenciDevamsizlikListesi($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+             
+            $sql = "  
+            SET NOCOUNT ON;  
+            IF OBJECT_ID('tempdb..#ogrenciIdDevamsizlikTarih') IS NOT NULL DROP TABLE #ogrenciIdDevamsizlikTarih; 
+    
+                CREATE TABLE #ogrenciIdDevamsizlikTarih
+                (    
+                    OgrenciDevamsizlikID [uniqueidentifier] ,  
+                    DersYiliID  [uniqueidentifier] ,    
+                    OgrenciID [uniqueidentifier] ,    
+                    DevamsizlikKodID int ,   
+                    DevamsizlikPeriyodID int ,  
+                    Tarih datetime ,   
+                    Aciklama varchar(100),  
+                    rownum int    
+                ) ;
+ 
+                INSERT INTO #ogrenciIdDevamsizlikTarih  (OgrenciDevamsizlikID, 
+                             DersYiliID, OgrenciID,
+                             DevamsizlikKodID,  DevamsizlikPeriyodID,  
+                             Tarih,  Aciklama,rownum )
+
+                SELECT 
+                             OgrenciDevamsizlikID, 
+                             DersYiliID,  
+                             OgrenciID,
+                             DevamsizlikKodID, 
+                             DevamsizlikPeriyodID,  
+                             Tarih, 
+                             Aciklama, 
+                             ROW_NUMBER() OVER(ORDER BY Tarih) AS rownum 
+                 FROM GNL_OgrenciDevamsizliklari 
+                     WHERE 
+                             DersYiliID = '".$params['dersYiliID']."' AND 
+                             OgrenciID ='".$params['kisiId']."'; 
+                
+                SELECT 
+                    tt.OgrenciDevamsizlikID, 
+                    tt.DersYiliID,  
+                    tt.OgrenciID,
+                    
+                    tt.DevamsizlikPeriyodID,  
+                    cast(tt.Tarih as date) as Tarih, 
+                    tt.Aciklama, 
+                    tt.rownum ,
+                    concat(cast(tt.DevamsizlikKodID as varchar(2)),' - ', dd.DevamsizlikAdi) as DevamsizlikAdi,
+                    cast(cast(dd.GunKarsiligi as numeric(10,2)) as varchar(5)) as GunKarsiligi
+                FROM #ogrenciIdDevamsizlikTarih tt
+                LEFT JOIN [dbo].[GNL_DevamsizlikKodlari] dd on dd.DevamsizlikKodID = tt.DevamsizlikKodID;
+ 
+
+                SET NOCOUNT OFF; 
+                 "; 
+            $statement = $pdo->prepare($sql);   
+            // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+  
+    
+    /** 
+     * @author Okan CIRAN
+     * @ login olan kurum yöneticileri için şube listesi   !! notlar kısmında kullanılıyor
+     * @version v 1.0  10.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function kurumyoneticisisubelistesi($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+            
+            $DersYiliID = '0F17DCF7-CCCC-CCCC-CCCC-D4CCFF77E487';
+            if ((isset($params['DersYiliID']) && $params['DersYiliID'] != "")) {
+                $DersYiliID = $params['DersYiliID'];
+            }
+            $sql = "  
+            SET NOCOUNT ON;    
+            SELECT * FROM ( 
+                SELECT     
+                    null as SinifID,
+                    null as DersYiliID,
+                    -1 as SeviyeID,
+                    '-1' as SinifKodu,
+                    null as SinifAdi,
+                    null as Sanal,
+                    null as SubeGrupID,
+                    null as SeviyeKodu,
+                    null as SinifOgretmeni,
+                    null as MudurYardimcisi,
+                    'LÜTFEN SEÇİNİZ...' as Aciklama 
+
+            UNION  
+               
+                SELECT 
+                    S.SinifID,
+                    S.DersYiliID,
+                    S.SeviyeID,
+                    S.SinifKodu,
+                    S.SinifAdi,
+                    S.Sanal,
+                    S.SubeGrupID,
+                    SEV.SeviyeKodu,
+                    concat( gks.Adi,' ',gks.Soyadi ) As SinifOgretmeni,
+                    concat(gkm.Adi,' ',gkm.Soyadi ) As MudurYardimcisi,
+                    concat(S.SinifAdi ,' - ', gks.Adi+' '+gks.Soyadi )  as Aciklama
+                FROM GNL_Siniflar S
+                INNER JOIN GNL_Seviyeler SEV ON S.SeviyeID = SEV.SeviyeID
+                LEFT JOIN GNL_SinifOgretmenleri SO ON (S.SinifID = SO.SinifID AND SO.OgretmenTurID=1)
+                LEFT JOIN GNL_SinifOgretmenleri MY ON (S.SinifID = MY.SinifID AND MY.OgretmenTurID=2)
+                LEFT JOIN GNL_Kisiler gks on gks.KisiID=SO.OgretmenID 
+                LEFT JOIN GNL_Kisiler gkm on gkm.KisiID=MY.OgretmenID
+                WHERE S.DersYiliID = '".$DersYiliID."'
+                AND S.Sanal < (CASE WHEN 1 = 0 THEN 2 ELSE 1 END)
+                 ) as fdsa
+                ORDER BY SeviyeID, SinifKodu;
+ 
+            SET NOCOUNT OFF;   
+                 "; 
+            $statement = $pdo->prepare($sql);   
+        // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+   
+      
+    /** 
+     * @author Okan CIRAN
+     * @ login olan kurum yöneticisinin sectiği subedeki ögrencilistesi  !! notlar kısmında kullanılıyor
+     * @version v 1.0  10.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function kysubeogrencilistesi($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+            
+           $SinifID =  'CCCC3986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['SinifID']) && $params['SinifID'] != "")) {
+                $SinifID = $params['SinifID'];
+            }
+            $sql = "  
+             SET NOCOUNT ON; 
+                SELECT 
+                    NULL AS OgrenciSeviyeID, 
+                    NULL AS OgrenciID, 
+                    NULL AS SinifID, 
+                    NULL AS OgrenciArsivTurID,  
+                    NULL AS OgrenciID,  
+                    NULL AS Numarasi,  
+                    NULL AS KisiID, 
+                    NULL AS CinsiyetID, 
+                    NULL AS Adi, 
+                    NULL AS Soyadi, 
+                    NULL AS TCKimlikNo, 
+                    NULL AS ePosta, 
+                    NULL AS Yasamiyor, 	
+                    NULL AS OdendiMi,  	
+                    NULL AS SeviyeID ,
+                    NULL AS Fotograf,
+                    'LÜTFEN SEÇİNİZ' as Aciklama
+
+                UNION
+
+                SELECT 
+                    GOS.[OgrenciSeviyeID], 
+                    GOS.[OgrenciID], 
+                    GOS.[SinifID], 
+                    GOS.[OgrenciArsivTurID], 
+                    OGR.[OgrenciID], 
+                    OOB.[Numarasi],
+                    KISI.[KisiID], 
+                    KISI.[CinsiyetID], 
+                    KISI.[Adi], 
+                    KISI.[Soyadi], 
+                    KISI.[TCKimlikNo], 
+                    KISI.[ePosta], 
+                    KISI.[Yasamiyor], 	
+                    dbo.FNC_GNL_AdayKayitUcretOdendiMi(GOS.[OgrenciID],DY.DersYiliID) AS OdendiMi,  	
+                    S.[SeviyeID] ,
+                    ff.Fotograf,
+                    concat(KISI.[Adi], ' ', KISI.[Soyadi]) as Aciklama
+                    /* --	GOS.[DavranisNotu1], 
+                    --	GOS.[DavranisNotu2], 
+                    --	GOS.[DavranisPuani],                     
+                    --	GOS.[OzursuzDevamsiz1], 
+                    --	GOS.[OzursuzDevamsiz2], 
+                    --	GOS.[OzurluDevamsiz1], 
+                    --	GOS.[OzurluDevamsiz2], 
+                    --	GOS.[YapilanSosyalEtkinlikSaati], 
+                    --	GOS.[SosyalEtkinlikTamamlandi], 
+                    --	GOS.[KayitYenileme], 
+                    --	GOS.[KayitYenilemeAciklamasi], 
+                    --	GOS.[YetistirmeKursu], 
+                    --	GOS.[YetistirmeKursuAciklamasi], 
+                    --	GOS.[Yatili], 
+                    --	GOS.[Gunduzlu], 
+                    --	GOS.[Parali], 
+                    --	GOS.[Yemekli], 
+                    --	GOS.[Burslu], 
+                    --	GOS.[BursOrani], 
+                    --	GOS.[KimlikParasi], 
+                    --	GOS.[SeviyedeOkulaKayitli], 
+                    -- GOS.[OgrenciArsivTurID], 
+                    --	OOB.[YabanciDilID], 
+                    --	OOB.[KayitTarihi], 
+                    --	OOB.[IkinciYabanciDilID], 
+                    */
+                    FROM GNL_OgrenciSeviyeleri GOS 
+                    INNER JOIN GNL_Siniflar S ON S.SinifID = GOS.SinifID  
+                    INNER JOIN GNL_Ogrenciler OGR ON (OGR.OgrenciID = GOS.OgrenciID) 
+                    INNER JOIN GNL_DersYillari DY ON (DY.DersYiliID = S.DersYiliID)  
+                    INNER JOIN GNL_OgrenciOkulBilgileri OOB ON (OOB.OgrenciID = OGR.OgrenciID AND OOB.OkulID= DY.OkulID)  
+                    INNER JOIN GNL_Kisiler KISI ON (KISI.KisiID = GOS.OgrenciID) 
+                    LEFT JOIN GNL_Fotograflar ff on ff.KisiID =GOS.OgrenciID
+                    WHERE  
+                            GOS.SinifID = Cast('".$SinifID."' AS nvarchar(39)) AND
+                            GOS.OgrenciArsivTurID =  cast(1 AS nvarchar(2))
+                            ; 
+
+            SET NOCOUNT OFF; 
+                 "; 
+            $statement = $pdo->prepare($sql);   
+        // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+   
+    
+     /** 
+     * @author Okan CIRAN
+     * @ login olan kurum yöneticisinin sectiği subedeki ögrencilistesi  !! notlar kısmında kullanılıyor
+     * @version v 1.0  10.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function kySubeOgrenciDersListesi($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+            
+           $OgrenciSeviyeID =  'CCCCCCC1-CCC2-CCC3-CCC4-CCCCCCCCCCC5';
+            if ((isset($params['OgrenciSeviyeID']) && $params['OgrenciSeviyeID'] != "")) {
+                $OgrenciSeviyeID = $params['OgrenciSeviyeID'];
+            }
+            $sql = "  
+            SET NOCOUNT ON; 
+            SELECT  OgrenciID ,
+                OgrenciSeviyeID ,
+                DersHavuzuID ,
+                Numarasi ,
+                Adi ,
+                Soyadi ,
+                ( Adi + ' ' + Soyadi ) AS AdiSoyadi ,
+                DersKodu ,
+                DersAdi ,
+                DonemID ,
+                Donem1_DonemNotu ,
+                Donem2_DonemNotu ,
+                PuanOrtalamasi ,
+                Donem1_PuanOrtalamasi ,
+                Donem2_PuanOrtalamasi ,
+                Donem1_DonemNotu AS AktifDonemNotu ,
+                YetistirmeKursuNotu ,
+                YilSonuNotu ,
+                YilSonuPuani , 
+                YilsonuToplamAgirligi , 
+                OdevAldi ,
+                ProjeAldi ,
+                OgrenciDersID ,
+                OgrenciDonemNotID ,  
+                PuanOrtalamasi ,
+                Hesaplandi ,
+                KanaatNotu ,
+                Sira ,
+                EgitimYilID ,
+                HaftalikDersSaati ,
+                Perf1OdevAldi ,
+                Perf2OdevAldi ,
+                Perf3OdevAldi ,
+                Perf4OdevAldi ,
+                Perf5OdevAldi ,
+                AltDers ,
+                YillikProjeAldi ,
+                YetistirmeKursunaGirecek ,
+                concat(DersOgretmenAdi ,' ', DersOgretmenSoyadi) as  OgretmenAdiSoyadi,
+                isPuanNotGirilsin ,
+                isPuanNotHesapDahil ,
+                AgirlikliYilSonuNotu ,
+                AgirlikliYilsonuPuani ,
+                PBYCOrtalama, 
+                DersSabitID 
+                
+        FROM    ( SELECT    
+                    YetistirmeKursuNotu ,
+                    YilSonuNotu ,
+                    YilSonuPuani ,
+                    YilsonuToplamAgirligi ,
+                    PuanOrtalamasi ,
+                    PuanOrtalamasi AS Donem1_PuanOrtalamasi ,
+                    Donem2_PuanOrtalamasi ,
+                    Hesaplandi ,
+                    ProjeAldi ,
+                    SinifID ,
+                    ODNB.DersHavuzuID ,
+                    ODNB.OgrenciSeviyeID ,
+                    ODNB.OgrenciDersID ,
+                    OgrenciDonemNotID ,
+                    Puan ,
+                    SinavTanimID ,
+                    Donem1_DonemNotu ,
+                    OdevAldi ,
+                    KanaatNotu ,
+                    Donem2_DonemNotu ,
+                    Numarasi ,
+                    OgrenciID ,
+                    Adi ,
+                    Soyadi ,
+                    DersKodu ,
+                    DersAdi ,
+                    DonemID ,
+                    Sira ,
+                    EgitimYilID ,
+                    HaftalikDersSaati ,
+                    Perf1OdevAldi ,
+                    Perf2OdevAldi ,
+                    Perf3OdevAldi ,
+                    Perf4OdevAldi ,
+                    Perf5OdevAldi ,
+                    AltDers ,
+                    ODNB.YillikProjeAldi ,
+                    YetistirmeKursunaGirecek ,
+                    DersSirasi = ISNULL(( SELECT    Sira
+                                          FROM      GNL_SinifDersleri SD
+                                          WHERE     SD.SinifID = ODNB.SinifID
+                                                    AND SD.DersHavuzuID = ODNB.DersHavuzuID
+                                        ), 999) ,
+                    DersOgretmenAdi ,
+                    DersOgretmenSoyadi ,
+                    isPuanNotGirilsin ,
+                    isPuanNotHesapDahil ,
+                    AgirlikliYilSonuNotu ,
+                    AgirlikliYilsonuPuani ,
+                    PBYCOrtalama, 
+                    DersSabitID 		 
+                FROM OgrenciDersNotBilgileri_Donem1 ODNB
+                LEFT JOIN dbo.GNL_OgrenciDersGruplari ODG ON ODG.OgrenciDersID = ODNB.OgrenciDersID
+                LEFT JOIN dbo.GNL_OgrenciDersGrupTanimlari ODGT ON 
+                            ODGT.OgrenciDersGrupTanimID=ODG.OgrenciDersGrupTanimID AND 
+                            ODG.OgrenciDersID = ODNB.OgrenciDersID  			  
+                WHERE isPuanNotGirilsin = 1 
+				                  ) p PIVOT
+	( MAX(Puan) FOR SinavTanimID IN ( [1], [2], [3], [4], [5], [6], [7], [8],
+                                      [9], [10], [11], [12], [13], [14], [15],
+                                      [19], [20], [21], [35], [36], [37], [38],
+                                      [39], [41], [42], [43], [44], [45] ) ) 
+	AS pvt
+        WHERE OgrenciSeviyeID = '".$OgrenciSeviyeID."' AND 
+                AltDers = 0   
+            SET NOCOUNT OFF; 
+                 "; 
+            $statement = $pdo->prepare($sql);   
+        // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+   
+    /** 
+     * @author Okan CIRAN
+     * @ login olan ögretmenin sectiği subedeki ögrencilistesi  !! sınavlar kısmında kullanılıyor
+     * @version v 1.0  10.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function ogretmensinavlistesi($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+            
+           $SinifID =  'CCCC3986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['SinifID']) && $params['SinifID'] != "")) {
+                $SinifID = $params['SinifID'];
+            }
+            $sql = "  
+             SET NOCOUNT ON; 
+                
+  
+
+            SET NOCOUNT OFF; 
+                 "; 
+            $statement = $pdo->prepare($sql);   
+        // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+   
   
 }

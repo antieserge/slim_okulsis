@@ -437,7 +437,7 @@ $app->get("/ogretmenDersPrgDersSaatleriOgrencileri_mbllogin/", function () use (
     if ($stripper->offsetExists('dersSirasi')) {
         $vdersSirasi = $stripper->offsetGet('dersSirasi')->getFilterValue();
     }
-     if ($stripper->offsetExists('dersYiliID')) {
+    if ($stripper->offsetExists('dersYiliID')) {
         $vdersYiliID = $stripper->offsetGet('dersYiliID')->getFilterValue();
     }
    
@@ -458,13 +458,15 @@ $app->get("/ogretmenDersPrgDersSaatleriOgrencileri_mbllogin/", function () use (
             "Tarih" => $menu["Tarih"],
             "DersSirasi" => $menu["DersSirasi"], 
             "DersYiliID" =>  ($menu["DersYiliID"]),
-            "Numarasi" => html_entity_decode($menu["Numarasi"]), 
-            "Adi" => html_entity_decode($menu["Adi"] ), 
-            "Soyadi" => html_entity_decode($menu["Soyadi"]),  
-            "TCKimlikNo" =>  html_entity_decode($menu["TCKimlikNo"]),
+            "Numarasi" => html_entity_decode($menu["Numarasi"]),
+            "Adsoyad" => html_entity_decode($menu["adsoyad"] ), 
+          //  "Adi" => html_entity_decode($menu["Adi"] ), 
+          //  "Soyadi" => html_entity_decode($menu["Soyadi"]),  
+          //  "TCKimlikNo" =>  html_entity_decode($menu["TCKimlikNo"]),
             "CinsiyetID" =>  html_entity_decode($menu["CinsiyetID"]),
             "DevamsizlikKodID" =>  html_entity_decode($menu["DevamsizlikKodID"]),
             "Aciklama" =>  html_entity_decode($menu["Aciklama"]), 
+            "Fotograf" =>  ($menu["Fotograf"]),  
                         
         );
     }
@@ -541,6 +543,445 @@ $app->get("/ogretmenVeliRandevulari_mbllogin/", function () use ($app ) {
 );
 
 
+/** 
+ *  * Okan CIRAN
+ * @since 05.10.2017
+ * rest servislere eklendi
+ */
+$app->get("/InsertDevamsizlik_mbllogin/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory(); 
+    $BLL = $app->getBLLManager()->get('mblLoginBLL');  
+    $headerParams = $app->request()->headers();
+      
+    $vKisiId = NULL;     
+    if (isset($_GET['kisiId'])) {
+        $stripper->offsetSet('kisiId', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['kisiId']));
+    }
+    $vDersYiliID= NULL;     
+    if (isset($_GET['DersYiliID'])) {
+        $stripper->offsetSet('DersYiliID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['DersYiliID']));
+    } 
+    $vSinifID = NULL;     
+    if (isset($_GET['SinifID'])) {
+        $stripper->offsetSet('SinifID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['SinifID']));
+    }
+    $vDersID = NULL;     
+    if (isset($_GET['DersID'])) {
+        $stripper->offsetSet('DersID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['DersID']));
+    }
+    $vDersSirasi= NULL;     
+    if (isset($_GET['DersSirasi'])) {
+        $stripper->offsetSet('DersSirasi', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['DersSirasi']));
+    }  
+    $vDonemID = NULL;     
+    if (isset($_GET['DonemID'])) {
+        $stripper->offsetSet('DonemID', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['DonemID']));
+    } 
+    $vOkulOgretmenID = NULL;     
+    if (isset($_GET['OkulOgretmenID'])) {
+        $stripper->offsetSet('OkulOgretmenID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['OkulOgretmenID']));
+    } 
+    $vTarih = NULL;     
+    if (isset($_GET['Tarih'])) {
+        $stripper->offsetSet('Tarih', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['Tarih']));
+    }
+    $vXmlData = NULL;     
+    if (isset($_GET['XmlData'])) {
+        $stripper->offsetSet('XmlData', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                $app, $_GET['XmlData']));
+    }
+    $vSinifDersID = NULL;     
+    if (isset($_GET['SinifDersID'])) {
+        $stripper->offsetSet('SinifDersID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['SinifDersID']));
+    }
+ 
+      
+    $stripper->strip();
+    if ($stripper->offsetExists('kisiId')) {
+        $vKisiId = $stripper->offsetGet('kisiId')->getFilterValue();
+    }
+    if ($stripper->offsetExists('DersYiliID')) {
+        $vDersYiliID = $stripper->offsetGet('DersYiliID')->getFilterValue();
+    }
+    if ($stripper->offsetExists('SinifID')) {
+        $vSinifID = $stripper->offsetGet('SinifID')->getFilterValue();
+    }
+    if ($stripper->offsetExists('DersID')) {
+        $vDersID = $stripper->offsetGet('DersID')->getFilterValue();
+    }
+    if ($stripper->offsetExists('DersSirasi')) {
+        $vDersSirasi = $stripper->offsetGet('DersSirasi')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('DonemID')) {
+        $vDonemID = $stripper->offsetGet('DonemID')->getFilterValue();
+    }
+    if ($stripper->offsetExists('OkulOgretmenID')) {
+        $vOkulOgretmenID = $stripper->offsetGet('OkulOgretmenID')->getFilterValue();
+    }
+    if ($stripper->offsetExists('Tarih')) {
+        $vTarih = $stripper->offsetGet('Tarih')->getFilterValue();
+    }
+    if ($stripper->offsetExists('XmlData')) {
+        $vXmlData = $stripper->offsetGet('XmlData')->getFilterValue();
+    }
+    if ($stripper->offsetExists('SinifDersID')) {
+        $vSinifDersID = $stripper->offsetGet('SinifDersID')->getFilterValue();
+    }
+    
+    $resDataInsert = $BLL->insertDevamsizlik(array(
+            'OgretmenID' => $vKisiId,  
+            'DersYiliID' => $vDersYiliID, 
+            'SinifID' => $vSinifID, 
+            'DersID' => $vDersID,  
+            'DersSirasi' => $vDersSirasi,  
+            'DonemID' => $vDonemID, 
+            'OkulOgretmenID' => $vOkulOgretmenID,  
+            'SinifDersID' => $vSinifDersID,  
+            'Tarih' => $vTarih,  
+            'XmlData' => $vXmlData,   
+            
+             ));
+        
+    $app->response()->header("Content-Type", "application/json"); 
+    $app->response()->body(json_encode($resDataInsert)); 
+    
+}
+);
+
+
+/**
+ *  * Okan CIRAN
+ * @since 09.10.2017
+ */
+$app->get("/VeliOgrencileri_mbllogin/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('mblLoginBLL'); 
+    $vkisiId = NULL;     
+    if (isset($_GET['kisiId'])) {
+        $stripper->offsetSet('kisiId', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['kisiId']));
+    }
+    $vdersYiliID= NULL;     
+    if (isset($_GET['dersYiliID'])) {
+        $stripper->offsetSet('dersYiliID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['dersYiliID']));
+    }    
+                
+           
+    $stripper->strip();
+    if ($stripper->offsetExists('kisiId')) {
+        $vkisiId = $stripper->offsetGet('kisiId')->getFilterValue();
+    }
+    if ($stripper->offsetExists('dersYiliID')) {
+        $vdersYiliID = $stripper->offsetGet('dersYiliID')->getFilterValue();
+    }
+    
+   
+    $resDataInsert = $BLL->veliOgrencileri(array( 
+        'url' => $_GET['url'], 
+        'kisiId' => $vkisiId,  
+        'dersYiliID' => $vdersYiliID,  
+        )); 
+  
+    $menus = array();
+    foreach ($resDataInsert as $menu){
+        $menus[]  = array(  
+            "OgrenciID" => $menu["OgrenciID"],
+            "SinifID" => $menu["SinifID"],
+            "DersYiliID" => $menu["DersYiliID"], 
+            "SinifKodu" =>  ($menu["SinifKodu"]),            
+            "SinifAdi" => html_entity_decode($menu["SinifAdi"]), 
+            "Numarasi" =>  ($menu["Numarasi"]),  
+            "OgrenciOkulBilgiID" =>   ($menu["OgrenciOkulBilgiID"]),
+            "KisiID" =>   ($menu["KisiID"]),
+            "CinsiyetID" =>   ($menu["CinsiyetID"]),
+            "Adi" =>  html_entity_decode($menu["Adi"]),             
+            "Soyadi" =>  html_entity_decode($menu["Soyadi"]),
+            "AdiSoyadi" =>  html_entity_decode($menu["Adi_Soyadi"]),             
+            "TCKimlikNo" =>  html_entity_decode($menu["TCKimlikNo"]),
+            "ePosta" =>   ($menu["ePosta"]), 
+            "OkulID" =>   ($menu["OkulID"]), 
+            "OgrenciSeviyeID" =>   ($menu["OgrenciSeviyeID"]), 
+            "Fotograf" =>   ($menu["Fotograf"]), 
+        );
+    }
+    
+    $app->response()->header("Content-Type", "application/json"); 
+    $app->response()->body(json_encode($menus));
+    
+    
+    
+    
+} 
+);
+
+
+/**
+ *  * Okan CIRAN
+ * @since 09.10.2017
+ */
+$app->get("/OgrenciDevamsizlikListesi_mbllogin/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('mblLoginBLL'); 
+    $vkisiId = NULL;     
+    if (isset($_GET['kisiId'])) {
+        $stripper->offsetSet('kisiId', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['kisiId']));
+    }
+    $vdersYiliID= NULL;     
+    if (isset($_GET['dersYiliID'])) {
+        $stripper->offsetSet('dersYiliID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['dersYiliID']));
+    }    
+                
+           
+    $stripper->strip();
+    if ($stripper->offsetExists('kisiId')) {
+        $vkisiId = $stripper->offsetGet('kisiId')->getFilterValue();
+    }
+    if ($stripper->offsetExists('dersYiliID')) {
+        $vdersYiliID = $stripper->offsetGet('dersYiliID')->getFilterValue();
+    }
+    
+   
+    $resDataInsert = $BLL->ogrenciDevamsizlikListesi(array( 
+        'url' => $_GET['url'], 
+        'kisiId' => $vkisiId,  
+        'dersYiliID' => $vdersYiliID,  
+        )); 
+  
+    $menus = array();
+    foreach ($resDataInsert as $menu){
+        $menus[]  = array(   
+            "OgrenciDevamsizlikID" => $menu["OgrenciDevamsizlikID"],
+            "DersYiliID" => $menu["DersYiliID"],
+            "OgrenciID" => $menu["OgrenciID"], 
+         //   "DevamsizlikKodID" =>  ($menu["DevamsizlikKodID"]),  
+            "DevamsizlikPeriyodID" =>  ($menu["DevamsizlikPeriyodID"]),  
+            "Tarih" => $menu["Tarih"], 
+            "rownum" =>  ($menu["rownum"]),  
+            "DevamsizlikPeriyodID" =>  ($menu["DevamsizlikPeriyodID"]), 
+            "DevamsizlikAdi" => html_entity_decode($menu["DevamsizlikAdi"]), 
+            "GunKarsiligi" => html_entity_decode($menu["GunKarsiligi"]), 
+            "Aciklama" => html_entity_decode($menu["Aciklama"]),  
+        );
+    }
+    
+    $app->response()->header("Content-Type", "application/json"); 
+    $app->response()->body(json_encode($menus)); 
+} 
+);
+
+
+
+/**
+ *  * Okan CIRAN
+ * @since 09.10.2017
+ */
+$app->get("/Kurumyoneticisisubelistesi_mbllogin/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('mblLoginBLL'); 
+    
+    $vdersYiliID= NULL;     
+    if (isset($_GET['dersYiliID'])) {
+        $stripper->offsetSet('dersYiliID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['dersYiliID']));
+    }            
+           
+    $stripper->strip();
+  
+    if ($stripper->offsetExists('dersYiliID')) {
+        $vdersYiliID = $stripper->offsetGet('dersYiliID')->getFilterValue();
+    }
+    
+   
+    $resDataInsert = $BLL->kurumyoneticisisubelistesi(array( 
+        'url' => $_GET['url'],  
+        'DersYiliID' => $vdersYiliID,  
+        )); 
+  
+    $menus = array();
+    foreach ($resDataInsert as $menu){
+        $menus[]  = array(   
+            "SinifID" => $menu["SinifID"],
+            "DersYiliID" => $menu["DersYiliID"],
+            "SeviyeID" => $menu["SeviyeID"], 
+            "SinifKodu" =>  ($menu["SinifKodu"]),            
+            "SinifAdi" => html_entity_decode($menu["SinifAdi"]), 
+            "Sanal" =>  ($menu["Sanal"]),  
+            "SubeGrupID" =>   ($menu["SubeGrupID"]),
+            "SeviyeKodu" =>   ($menu["SeviyeKodu"]), 
+            "SinifOgretmeni" =>  html_entity_decode($menu["SinifOgretmeni"]),             
+            "MudurYardimcisi" =>  html_entity_decode($menu["MudurYardimcisi"]),
+            "Aciklama" =>  html_entity_decode($menu["Aciklama"]),             
+            
+        );
+    }
+    
+    $app->response()->header("Content-Type", "application/json"); 
+    $app->response()->body(json_encode($menus));
+    
+      
+} 
+);
+
+
+/**
+ *  * Okan CIRAN
+ * @since 09.10.2017
+ */
+$app->get("/Kysubeogrencilistesi_mbllogin/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('mblLoginBLL'); 
+    
+    $vSinifID= NULL;     
+    if (isset($_GET['sinifID'])) {
+        $stripper->offsetSet('sinifID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['sinifID']));
+    }            
+           
+    $stripper->strip();
+  
+    if ($stripper->offsetExists('sinifID')) {
+        $vSinifID = $stripper->offsetGet('sinifID')->getFilterValue();
+    }
+    
+   
+    $resDataInsert = $BLL->kysubeogrencilistesi(array( 
+        'url' => $_GET['url'],  
+        'SinifID' => $vSinifID,  
+        )); 
+  
+    $menus = array();
+    foreach ($resDataInsert as $menu){
+        $menus[]  = array(   
+            "OgrenciSeviyeID" => $menu["OgrenciSeviyeID"],
+            "OgrenciID" => $menu["OgrenciID"],
+            "SinifID" => $menu["SinifID"], 
+            "OgrenciID" =>  ($menu["OgrenciID"]),            
+            "Numarasi" => html_entity_decode($menu["Numarasi"]), 
+            "KisiID" =>  ($menu["KisiID"]),  
+            "CinsiyetID" =>   ($menu["CinsiyetID"]), 
+            "Adi" =>  html_entity_decode($menu["Adi"]),             
+            "Soyadi" =>  html_entity_decode($menu["Soyadi"]),
+            "TCKimlikNo" =>  html_entity_decode($menu["TCKimlikNo"]),             
+            "ePosta" =>  html_entity_decode($menu["ePosta"]),             
+            "SeviyeID" =>   ($menu["SeviyeID"]),
+            "Aciklama" =>  html_entity_decode($menu["Aciklama"]),   
+            "Fotograf" =>   ($menu["Fotograf"]), 
+        );
+    }
+    
+    $app->response()->header("Content-Type", "application/json"); 
+    $app->response()->body(json_encode($menus));
+    
+     
+} 
+);
+ 
+
+/**
+ *  * Okan CIRAN
+ * @since 09.10.2017
+ */
+$app->get("/KySubeOgrenciDersListesi_mbllogin/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('mblLoginBLL'); 
+    
+    $vOgrenciSeviyeID= NULL;     
+    if (isset($_GET['ogrenciSeviyeID'])) {
+        $stripper->offsetSet('ogrenciSeviyeID', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['ogrenciSeviyeID']));
+    }            
+           
+    $stripper->strip();
+  
+    if ($stripper->offsetExists('ogrenciSeviyeID')) {
+        $vOgrenciSeviyeID = $stripper->offsetGet('ogrenciSeviyeID')->getFilterValue();
+    }
+    
+   
+    $resDataInsert = $BLL->KySubeOgrenciDersListesi(array( 
+        'url' => $_GET['url'],  
+        'OgrenciSeviyeID' => $vOgrenciSeviyeID,  
+        )); 
+  
+    $menus = array();
+    foreach ($resDataInsert as $menu){
+        $menus[]  = array(   
+            "DersAdi" =>  html_entity_decode($menu["DersAdi"]), 
+            "HaftalikDersSaati" =>   ($menu["HaftalikDersSaati"]), 
+            "Donem1_DonemNotu" =>   ($menu["Donem1_DonemNotu"]),             
+            "Donem2_DonemNotu" =>   ($menu["Donem2_DonemNotu"]),
+            "YilSonuNotu" =>   ($menu["YilSonuNotu"]), 
+            "YilSonuPuani" =>   ($menu["YilSonuPuani"]), 
+            
+         //   "OgrenciSeviyeID" => $menu["OgrenciSeviyeID"],
+         //   "DersHavuzuID" => $menu["DersHavuzuID"],
+         //   "Numarasi" => $menu["Numarasi"], 
+        //    "AdiSoyadi" =>  html_entity_decode($menu["AdiSoyadi"]),            
+        //    "DersKodu" =>  ($menu["Numarasi"]), 
+           
+        //    "DonemID" =>   ($menu["DonemID"]), 
+           
+         //   "PuanOrtalamasi" =>   ($menu["PuanOrtalamasi"]),             
+        //    "Donem1_PuanOrtalamasi" =>   ($menu["Donem1_PuanOrtalamasi"]),             
+        //    "Donem2_PuanOrtalamasi" =>   ($menu["Donem2_PuanOrtalamasi"]),
+         //   "AktifDonemNotu" =>   ($menu["AktifDonemNotu"]),   
+        //    "YetistirmeKursuNotu" =>   ($menu["YetistirmeKursuNotu"]),             
+        //    "YetistirmeKursuNotu" =>   ($menu["YetistirmeKursuNotu"]), 
+          
+           
+        //    "YilsonuToplamAgirligi" =>   ($menu["YilsonuToplamAgirligi"]), 
+        //    "OdevAldi" =>    ($menu["OdevAldi"]), 
+        //    "ProjeAldi" =>   ($menu["ProjeAldi"]), 
+        //    "OgrenciDersID" =>   ($menu["OgrenciDersID"]), 
+        //    "OgrenciDonemNotID" =>   ($menu["OgrenciDonemNotID"]), 
+         //   "PuanOrtalamasi" =>   ($menu["PuanOrtalamasi"]), 
+         //   "Hesaplandi" =>   ($menu["Hesaplandi"]), 
+         //   "KanaatNotu" =>   ($menu["KanaatNotu"]), 
+        //    "Sira" =>   ($menu["Sira"]), 
+         //   "EgitimYilID" =>   ($menu["EgitimYilID"]), 
+            
+         //   "Perf1OdevAldi" =>   ($menu["Perf1OdevAldi"]), 
+        //    "Perf2OdevAldi" =>   ($menu["Perf2OdevAldi"]), 
+         //   "Perf3OdevAldi" =>   ($menu["Perf3OdevAldi"]), 
+         //   "Perf4OdevAldi" =>   ($menu["Perf4OdevAldi"]), 
+        //    "Perf5OdevAldi" =>   ($menu["Perf5OdevAldi"]), 
+        //    "AltDers" =>   ($menu["AltDers"]), 
+        //    "YillikProjeAldi" =>   ($menu["YillikProjeAldi"]), 
+         //   "YetistirmeKursunaGirecek" =>  ($menu["YetistirmeKursunaGirecek"]),             
+        //    "OgretmenAdiSoyadi" =>   html_entity_decode($menu["OgretmenAdiSoyadi"]),
+        //    "isPuanNotGirilsin" =>   ($menu["isPuanNotGirilsin"]),
+       //     "isPuanNotHesapDahil" =>   ($menu["isPuanNotHesapDahil"]),
+         //   "AgirlikliYilSonuNotu" =>   ($menu["AgirlikliYilSonuNotu"]),
+         //   "AgirlikliYilsonuPuani" =>   ($menu["AgirlikliYilsonuPuani"]),
+         //   "PBYCOrtalama" =>   ($menu["PBYCOrtalama"]),
+        //    "DersSabitID" =>   ($menu["DersSabitID"]), 
+        );
+    }
+    
+    $app->response()->header("Content-Type", "application/json"); 
+    $app->response()->body(json_encode($menus));
+    
+     
+} 
+);
 
 
 
