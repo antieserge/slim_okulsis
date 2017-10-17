@@ -275,5 +275,27 @@ class MblLogin extends \BLL\BLLSlim{
     $resultSet = $DAL->kySubeOgrenciDersListesi($params);  
     return $resultSet['resultSet'];
     } 
+     
+     /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function ogretmensinavlistesi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->ogretmensinavlistesi($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function yakinisinavlistesi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->yakinisinavlistesi($params);  
+    return $resultSet['resultSet'];
+    } 
 }
 

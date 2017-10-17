@@ -330,7 +330,7 @@ class MblLogin extends \DAL\DalSlim {
 
                  "; 
             $statement = $pdo->prepare($sql);   
-    // echo debugPDO($sql, $params);
+   //  echo debugPDO($sql, $params);
             $statement->execute();
            
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -695,7 +695,7 @@ class MblLogin extends \DAL\DalSlim {
     }
    
     
-               /** 
+    /** 
      * @author Okan CIRAN
      * @ login olan ogretmenin velilerle olan randevu listesi.  !!
      * @version v 1.0  03.10.2017
@@ -1413,20 +1413,117 @@ class MblLogin extends \DAL\DalSlim {
     public function ogretmensinavlistesi($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
-            
-           $SinifID =  'CCCC3986-CCCC-CCCC-CCCC-CCC8E61A6F39';
-            if ((isset($params['SinifID']) && $params['SinifID'] != "")) {
-                $SinifID = $params['SinifID'];
+           
+            $OgretmenID =  'CCC13986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['OgretmenID']) && $params['OgretmenID'] != "")) {
+                $OgretmenID = $params['OgretmenID'];
             }
+            $OkulID =  'CCC23986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['OkulID']) && $params['OkulID'] != "")) {
+                $OkulID = $params['OkulID'];
+            }
+            $KisiID =  'CCC33986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['KisiID']) && $params['KisiID'] != "")) {
+                $KisiID = $params['KisiID'];
+            }
+            $EgitimYilID =  -1;
+            if ((isset($params['EgitimYilID']) && $params['EgitimYilID'] != "")) {
+                $EgitimYilID = $params['EgitimYilID'];
+            }
+            $OkulOgretmenID = 'CCC33986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            $operationId = $this->findByOkulOgretmenID(
+                            array( 'OgretmenID' =>$OgretmenID, 'OkulID' => $OkulID,));
+            if (\Utill\Dal\Helper::haveRecord($operationId)) {
+                $OkulOgretmenID = $operationId ['resultSet'][0]['OkulOgretmenID'];
+            }   
+             
+            
             $sql = "  
-             SET NOCOUNT ON; 
-                
-  
+            SET NOCOUNT ON;  
+            IF OBJECT_ID('tempdb..#okiogrsinavlari') IS NOT NULL DROP TABLE #okiogrsinavlari; 
 
+            CREATE TABLE #okiogrsinavlari
+                            (
+                            /* OgretmenID [uniqueidentifier], */ 
+                            SinavID [uniqueidentifier], 
+                            OkulID [uniqueidentifier], 
+                            OkulOgretmenID [uniqueidentifier],
+                            SinavTurID int,	
+                            SeviyeID int,
+                            SinavUygulamaSekliID int,
+                            KitapcikTurID int,
+                            SinavKodu varchar(100),
+                            SinavAciklamasi varchar(100),
+                            SinavTarihi datetime,
+                            SinavBitisTarihi datetime, 
+                            SinavSuresi int, 
+                            KitapcikSayisi int, 
+                            DogruSilenYanlisSayisi int, 
+                            PuanlarYuvarlansinMi int, 
+                            OrtalamaVeSapmaHesaplansinMi int, 
+                            SiralamadaYasKontroluYapilsinMi int, 	
+                            isDegerlendirildi int,
+                            isAlistirma int,
+                            OptikFormGirisiYapilabilirMi int,
+                            isOtherTeachers int,
+                            isUserExam int,
+                            isOgrenciVeliSinavVisible int,
+                            isAltKurumHidden int,
+                            sonBasilabilirOnayTarihi datetime,
+                            SinavTurAdi varchar(100) ,
+                            SeviyeKodu varchar(10) ,
+                            NotDonemID int,
+                            SinavTanimID int, 
+                            isNotAktarildi bit 
+                                                ) ;
+
+                    INSERT #okiogrsinavlari EXEC [dbo].[PRC_SNV_Sinavlar_FindForOgretmen]
+                                                    @OkulOgretmenID = '".$OkulOgretmenID."',
+                                                    @EgitimYilID = ".intval($EgitimYilID).",
+                                                    @OkulID = '".$OkulID."',
+                                                    @KisiID =  '".$KisiID."' ; 
+
+                    select  
+                        gd.[Donem] , 
+                        SinavTarihi ,
+                        SinavBitisTarihi , 
+                        SinavTurAdi  ,
+                        SinavKodu ,
+                        SinavAciklamasi  
+                    /*
+                        SinavTurID ,	
+                        SeviyeID ,
+                        SinavUygulamaSekliID ,
+                        KitapcikTurID ,
+                        SinavSuresi , 
+                        KitapcikSayisi , 
+                        DogruSilenYanlisSayisi , 
+                        PuanlarYuvarlansinMi , 
+                        OrtalamaVeSapmaHesaplansinMi , 
+                        SiralamadaYasKontroluYapilsinMi , 	
+                        isDegerlendirildi ,
+                        isAlistirma ,
+                        OptikFormGirisiYapilabilirMi ,
+                        isOtherTeachers ,
+                        isUserExam ,
+                        isOgrenciVeliSinavVisible ,
+                        isAltKurumHidden ,
+                        sonBasilabilirOnayTarihi ,
+                        SeviyeKodu  ,
+                        SinavTanimID , 
+                        isNotAktarildi  ,
+                        OgretmenID  ,
+                        SinavID ,  
+                        OkulID , 
+                        OkulOgretmenID 
+                    */
+                    from #okiogrsinavlari a 
+                    inner join [dbo].[GNL_Donemler] gd on gd.DonemID = a.NotDonemID 
+ 
             SET NOCOUNT OFF; 
                  "; 
             $statement = $pdo->prepare($sql);   
-        // echo debugPDO($sql, $params);
+         // echo debugPDO($sql, $params);
             $statement->execute();
            
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -1439,5 +1536,194 @@ class MblLogin extends \DAL\DalSlim {
         }
     }
    
+    /** 
+     * @author Okan CIRAN
+     * @ login olan ögretmenin sectiği subedeki ögrencilistesi  !! sınavlar kısmında kullanılıyor
+     * @version v 1.0  10.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function yakinisinavlistesi($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+           
+            $OgretmenID =  'CCC13986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['OgretmenID']) && $params['OgretmenID'] != "")) {
+                $OgretmenID = $params['OgretmenID'];
+            }
+            $OkulID =  'CCC23986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['OkulID']) && $params['OkulID'] != "")) {
+                $OkulID = $params['OkulID'];
+            }
+            $KisiID =  'CCC33986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            if ((isset($params['KisiID']) && $params['KisiID'] != "")) {
+                $KisiID = $params['KisiID'];
+            }
+            $EgitimYilID =  -1;
+            if ((isset($params['EgitimYilID']) && $params['EgitimYilID'] != "")) {
+                $EgitimYilID = $params['EgitimYilID'];
+            }
+            
+            $OkulOgretmenID = 'CCC33986-CCCC-CCCC-CCCC-CCC8E61A6F39';
+            $operationId = $this->findByOkulOgretmenID(
+                            array( 'OgretmenID' =>$OgretmenID, 'OkulID' => $OkulID,));
+            if (\Utill\Dal\Helper::haveRecord($operationId)) {
+                $OkulOgretmenID = $operationId ['resultSet'][0]['OkulOgretmenID'];
+            }   
+            
+            $sql = "  
+            SET NOCOUNT ON;  
+            IF OBJECT_ID('tempdb..#okiyakinsinavlari') IS NOT NULL DROP TABLE #okiyakinsinavlari; 
+
+            CREATE TABLE #okiyakinsinavlari
+                            ( 
+                            SinavID [uniqueidentifier],
+                            OkulID [uniqueidentifier], 
+                            OkulOgretmenID [uniqueidentifier],
+                            SinavTurID int,	
+                            SeviyeID int,
+                            SinavUygulamaSekliID int,
+                            KitapcikTurID int,
+                            SinavKodu varchar(100),
+                            SinavAciklamasi varchar(100),
+                            SinavTarihi datetime,
+                            SinavBitisTarihi datetime,    
+                            SinavSuresi int, 
+                            KitapcikSayisi int, 
+                            DogruSilenYanlisSayisi int, 
+                            PuanlarYuvarlansinMi int, 
+                            OrtalamaVeSapmaHesaplansinMi int, 
+                            SiralamadaYasKontroluYapilsinMi int, 
+                            isDegerlendirildi int,
+                            isAlistirma int,
+                            OptikFormGirisiYapilabilirMi int,
+                            isOtherTeachers int,
+                            isUserExam int,
+                            isOgrenciVeliSinavVisible int,
+                            isAltKurumHidden int,
+                            sonBasilabilirOnayTarihi datetime, 
+                            SinavTurAdi varchar(100) ,
+                            SeviyeKodu varchar(10) ,
+                             NotDonemID int,
+                            SinavTanimID int,      
+                            isNotAktarildi bit,
+                            SinavOgrenciID [uniqueidentifier]
+                                                ) ;
+
+                    INSERT #okiyakinsinavlari EXEC [dbo].[PRC_SNV_Sinavlar_FindForOgrenci]
+                                                    @OkulOgretmenID = '".$OkulOgretmenID."',
+                                                    @EgitimYilID = ".intval($EgitimYilID).",
+                                                    @OkulID = '".$OkulID."',
+                                                    @KisiID =  '".$KisiID."' ; 
+
+                    select  
+                        gd.[Donem] , 
+                        SinavTarihi ,
+                        SinavBitisTarihi , 
+                        SinavTurAdi  ,
+                        SinavKodu ,
+                        SinavAciklamasi  
+                    /*
+                        SinavTurID ,	
+                        SeviyeID ,
+                        SinavUygulamaSekliID ,
+                        KitapcikTurID ,
+                        SinavSuresi , 
+                        KitapcikSayisi , 
+                        DogruSilenYanlisSayisi , 
+                        PuanlarYuvarlansinMi , 
+                        OrtalamaVeSapmaHesaplansinMi , 
+                        SiralamadaYasKontroluYapilsinMi , 	
+                        isDegerlendirildi ,
+                        isAlistirma ,
+                        OptikFormGirisiYapilabilirMi ,
+                        isOtherTeachers ,
+                        isUserExam ,
+                        isOgrenciVeliSinavVisible ,
+                        isAltKurumHidden ,
+                        sonBasilabilirOnayTarihi ,
+                        SeviyeKodu  ,
+                        SinavTanimID , 
+                        isNotAktarildi  ,
+                        OgretmenID  ,
+                        SinavID ,  
+                        OkulID , 
+                        OkulOgretmenID ,
+                        SinavOgrenciID
+                    */
+                    from #okiyakinsinavlari a 
+                    inner join [dbo].[GNL_Donemler] gd on gd.DonemID = a.NotDonemID ;
+ 
+            SET NOCOUNT OFF; 
+                 "; 
+            $statement = $pdo->prepare($sql);   
+       // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+   
+    /** 
+     * @author Okan CIRAN
+     * @ login olan ogretmenin velilerle olan randevu listesi.  !!
+     * @version v 1.0  03.10.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function findByOkulOgretmenID($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
+             $OkulID = 'CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC';
+            if ((isset($params['OkulID']) && $params['OkulID'] != "")) {
+                $OkulID = $params['OkulID'];
+            }
+             $OgretmenID = 'CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC';
+            if ((isset($params['OgretmenID']) && $params['OgretmenID'] != "")) {
+                $OgretmenID = $params['OgretmenID'];
+            }
+           
+            $sql = "  
+            SET NOCOUNT ON;    	 
+            IF OBJECT_ID('tempdb..#okiOkulOgretmenID') IS NOT NULL DROP TABLE #okiOkulOgretmenID; 
+
+            CREATE TABLE #okiOkulOgretmenID
+                            (
+                            OkulOgretmenID [uniqueidentifier],
+                            OkulID [uniqueidentifier], 
+                            OgretmenID [uniqueidentifier]   ) ;
+
+            INSERT #okiOkulOgretmenID EXEC PRC_OGT_OkulOgretmen_FindByOkulOgretmenID 
+                @OkulID= '".$OkulID."',
+                @OgretmenID=  '".$OgretmenID."' ; 
+
+            SELECT *,   
+            (CASE WHEN (1 = 1) THEN 1 ELSE 0 END)  as control
+            from #okiOkulOgretmenID ;  
+            SET NOCOUNT OFF;  
+                 "; 
+            $statement = $pdo->prepare($sql);   
+            // echo debugPDO($sql, $params);
+            $statement->execute();
+           
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {    
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+   
+  
   
 }
