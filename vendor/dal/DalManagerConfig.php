@@ -96,7 +96,7 @@ class DalManagerConfig {
                 'sysNotificationRestservicesPDO' => 'DAL\Factory\PDO\SysNotificationRestservicesFactory',
                 'sysSectorsPDO' => 'DAL\Factory\PDO\SysSectorsFactory',
                 'mblLoginPDO' => 'DAL\Factory\PDO\MblLoginFactory',
-                
+                'mobilSettingsPDO' => 'DAL\Factory\PDO\MobilSettingsFactory',
                 
                 
             ],

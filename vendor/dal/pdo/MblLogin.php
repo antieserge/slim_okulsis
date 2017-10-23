@@ -372,8 +372,8 @@ class MblLogin extends \DAL\DalSlim {
                         ,[divid] 
                     FROM [dbo].[GNL_Mobil_Menuleri]
                     where active = 0 AND deleted = 0 AND 
-                        [RolID] = ".intval($params['RolID'])."  AND 
-                        [ParentID] = ".intval($parent)."
+                        [RolID] = ".intval($params['RolID'])."  
+                       /* AND [ParentID] = ".intval($parent)." */
                     order by MenuID
                  "; 
             $statement = $pdo->prepare($sql);            
