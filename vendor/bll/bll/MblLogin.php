@@ -438,7 +438,7 @@ class MblLogin extends \BLL\BLLSlim{
      * @param array | null $params 
      * @return array
      */
-    public function gelenMesajDetayodevListesiOgrenciveYakin($params = array()) {
+    public function gelenMesajDetay($params = array()) {
     $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
     $resultSet = $DAL->gelenMesajDetay($params);  
     return $resultSet['resultSet'];

@@ -49,22 +49,28 @@ $app->get("/gnlKullaniciMebKoduFindByTcKimlikNo_mbllogin/", function () use ($ap
     $stripper = $app->getServiceManager()->get('filterChainerCustom');
     $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
     $BLL = $app->getBLLManager()->get('mblLoginBLL'); 
-    $vtc = NULL;
-     
+    $vtc = NULL; 
     if (isset($_GET['tc'])) {
         $stripper->offsetSet('tc', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
                 $app, $_GET['tc']));
     }
-   
+    $vcid = NULL;
+   if (isset($_GET['CID'])) {
+        $stripper->offsetSet('CID', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['CID']));
+    }
     $stripper->strip();
     if ($stripper->offsetExists('tc')) {
         $vtc = $stripper->offsetGet('tc')->getFilterValue();
     }
-    
+    if ($stripper->offsetExists('CID')) {
+        $vcid = $stripper->offsetGet('CID')->getFilterValue();
+    }
    
     $resDataInsert = $BLL->gnlKullaniciMebKoduFindByTcKimlikNo(array( 
         'url' => $_GET['url'], 
         'tc' => $vtc, 
+        'Cid' => $vcid, 
         ));
     $app->response()->header("Content-Type", "application/json");
     $app->response()->body(json_encode($resDataInsert));

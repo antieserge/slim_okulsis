@@ -62,6 +62,10 @@ class config {
                 'filterTrim' => 'Services\Filter\FilterTrim',
                 'filterOnlyOrder' => 'Services\Filter\FilterOnlyOrder',
                 
+                'pgConnectFactoryBilsanet' => 'Services\Database\Postgresql\PostgreSQLConnectPDOBilsanet',
+                'pgConnectFactoryTedAnkara' => 'Services\Database\Postgresql\PostgreSQLConnectPDOTedAnkara',
+                
+                
                 
             ],
         ),

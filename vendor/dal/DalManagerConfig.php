@@ -97,6 +97,7 @@ class DalManagerConfig {
                 'sysSectorsPDO' => 'DAL\Factory\PDO\SysSectorsFactory',
                 'mblLoginPDO' => 'DAL\Factory\PDO\MblLoginFactory',
                 'mobilSettingsPDO' => 'DAL\Factory\PDO\MobilSettingsFactory',
+                'mobilSetDbConfigxPDO' => 'DAL\Factory\PDO\MobilSetDbConfigxFactory',
                 
                 
             ],

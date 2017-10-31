@@ -14,7 +14,7 @@ namespace Services\Database\Postgresql;
  * service manager layer for database connection
  * @author Okan CIRAN
  */
-class PostgreSQLConnectPDO implements \Zend\ServiceManager\FactoryInterface {
+class PostgreSQLConnectPDOTedAnkara implements \Zend\ServiceManager\FactoryInterface {
     
     /**
      * service ceration via factory on zend service manager
@@ -29,7 +29,7 @@ class PostgreSQLConnectPDO implements \Zend\ServiceManager\FactoryInterface {
                             PostgreSQLConnectPDOConfig::getConfig());
            * 
            */
-              $pdo = new \PDO("sqlsrv:Server=ZZX;Database=Bilsanet1", 
+              $pdo = new \PDO("sqlsrv:Server=ZZX;Database=BILSATED_ANK", 
                             "sa", 
                             "12345678oki"
                             );

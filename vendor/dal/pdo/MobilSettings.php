@@ -120,36 +120,34 @@ class MobilSettings extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory'); 
             $sql = "  
-                    set nocount on; 
-              select * from (       
+            SET NOCOUNT ON; 
+            SELECT * FROM (       
                 SELECT   
-                        -1 as id , 
-                        NULL AS [proxy],
-                        NULL AS [logo],
-                        'LÜTFEN SEÇİNİZ !' AS [abbrevation],
-                        NULL AS [schoolName] ,
-                        NULL AS combologo
+                    -1 AS id , 
+                    NULL AS [proxy],
+                    NULL AS [logo],
+                    'LÜTFEN SEÇİNİZ !' AS [abbrevation],
+                    NULL AS [schoolName] ,
+                    NULL AS combologo
                      
-                    union   
+                UNION   
 
-                    SELECT   
-                        id,
-                        [proxy],
-                        [logo],
-                        [abbrevation],
-                        [schoolName],
-                        combologo
-                      FROM [Bilsanet1].[dbo].[GNL_Mobil_Settings]
-                     where active =0 and deleted =0 
-                     ) as ssss 
-                     order by id 
-		    SET NOCOUNT OFF;
-
+                SELECT   
+                    id,
+                    [proxy],
+                    [logo],
+                    [abbrevation],
+                    [schoolName],
+                    combologo
+                FROM  [dbo].[GNL_Mobil_Settings]
+                WHERE active =0 AND deleted =0 
+                ) as ssss 
+            ORDER BY id 
+            SET NOCOUNT OFF; 
                  "; 
             $statement = $pdo->prepare($sql);   
    //  echo debugPDO($sql, $params);
-            $statement->execute();
-           
+            $statement->execute(); 
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             $errorInfo = $statement->errorInfo();
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
