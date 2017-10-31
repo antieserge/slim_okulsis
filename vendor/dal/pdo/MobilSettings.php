@@ -124,18 +124,21 @@ class MobilSettings extends \DAL\DalSlim {
               select * from (       
                 SELECT   
                         -1 as id , 
-                          NULL AS [proxy]
-                          ,NULL AS [logo]
-                          ,'LÜTFEN SEÇİNİZ !' AS [abbrevation]
-                          ,NULL AS [schoolName]                           
+                        NULL AS [proxy],
+                        NULL AS [logo],
+                        'LÜTFEN SEÇİNİZ !' AS [abbrevation],
+                        NULL AS [schoolName] ,
+                        NULL AS combologo
                      
                     union   
 
-                    SELECT   id,
-                           [proxy]
-                          ,[logo]
-                          ,[abbrevation]
-                          ,[schoolName]                           
+                    SELECT   
+                        id,
+                        [proxy],
+                        [logo],
+                        [abbrevation],
+                        [schoolName],
+                        combologo
                       FROM [Bilsanet1].[dbo].[GNL_Mobil_Settings]
                      where active =0 and deleted =0 
                      ) as ssss 

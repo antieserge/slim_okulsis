@@ -61,7 +61,8 @@ $app->get("/mobilUrlData_mobilsettings/", function () use ($app ) {
             "logo" => $menu["logo"], 
             "abbrevation" => html_entity_decode($menu["abbrevation"]), 
             "schoolName" => html_entity_decode($menu["schoolName"]), 
-         
+            "combologo" => $menu["combologo"], 
+            
         );
     }
     

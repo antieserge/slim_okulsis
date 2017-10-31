@@ -297,5 +297,165 @@ class MblLogin extends \BLL\BLLSlim{
     $resultSet = $DAL->yakinisinavlistesi($params);  
     return $resultSet['resultSet'];
     } 
+    
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function kurumYoneticisiSinavListesi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->kurumYoneticisiSinavListesi($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function gelenMesajListesi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->gelenMesajListesi($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function odevListesiOgretmen($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->odevListesiOgretmen($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+       
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function odevListesiKurumYoneticisi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->odevListesiKurumYoneticisi($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+      /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function ogretmenDersProgramiListesi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->ogretmenDersProgramiListesi($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function ogrenciVeYakiniDersProgramiListesi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->ogrenciVeYakiniDersProgramiListesi($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params
+        * pk zorunlu 
+     * @return array
+     */
+    public function kurumPersoneliSinifListesi($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+        $resultSet = $DAL->kurumPersoneliSinifListesi($params);  
+        return $resultSet['resultSet'];
+    }
+      
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function kurumPersoneliDersProgramiListesi($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->kurumPersoneliDersProgramiListesi($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function sinifSeviyeleriCombo($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->sinifSeviyeleriCombo($params);  
+    return $resultSet['resultSet'];
+    } 
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function sinifSeviyeleri($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->sinifSeviyeleri($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function gnlProfil($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->gnlProfil($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function kurumVePersonelDevamsizlik($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->kurumVePersonelDevamsizlik($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function gelenMesajDetayodevListesiOgrenciveYakin($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->gelenMesajDetay($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+     /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params 
+     * @return array
+     */
+    public function odevListesiOgrenciveYakin($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('mblLoginPDO');
+    $resultSet = $DAL->odevListesiOgrenciveYakin($params);  
+    return $resultSet['resultSet'];
+    } 
+    
+    
+    
 }
 
